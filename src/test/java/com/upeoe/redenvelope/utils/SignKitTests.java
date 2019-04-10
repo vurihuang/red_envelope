@@ -15,8 +15,8 @@ public class SignKitTests {
         Assert.assertEquals(sign.length(), SignKit.DEFAULT_SIGN_LEN);
         Assert.assertTrue(sign.length() > 0);
 
-        sign = SignKit.generate(8);
-        Assert.assertEquals(sign.length(), 8);
+        sign = SignKit.generate(6);
+        Assert.assertEquals(sign.length(), 6);
         Assert.assertTrue(sign.length() > 0);
     }
 

@@ -8,7 +8,7 @@ import java.util.Random;
  */
 public class SignKit {
 
-    public static final int DEFAULT_SIGN_LEN = 6;
+    public static final int DEFAULT_SIGN_LEN = 8;
 
     private static final char[] CHARS = {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
