@@ -14,6 +14,7 @@ import java.util.Random;
  */
 public class RedEnvelopeKit {
     private static final double MIN_MONEY = 0.01;
+    private static final double ZERO = 0;
 
     /**
      * 获取下一次红包随机金额
@@ -23,6 +24,9 @@ public class RedEnvelopeKit {
      * @return 红包随机金额
      */
     public static double genNextMoney(int remainNum, double remainMoney) {
+        if (remainNum <= 0 || remainMoney <= 0) {
+            return ZERO;
+        }
         if (remainNum == 1) {
             return MathKit.divide(MathKit.multiply(remainMoney, 100), 100);
         }
@@ -43,6 +47,9 @@ public class RedEnvelopeKit {
      */
     public static List<Double> genListMoney(int num, double money) {
         List<Double> envelopes = new ArrayList<>();
+        if (num <= 0 || money <= 0) {
+            return envelopes;
+        }
 
         if (num == 1) {
             envelopes.add(money);
