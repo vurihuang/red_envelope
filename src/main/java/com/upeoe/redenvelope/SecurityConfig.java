@@ -17,10 +17,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         final AuthFilter authFilter = new AuthFilter(authenticationManager());
 
-        http.cors().disable()
+        http.cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/token/**").permitAll()
+                .antMatchers("/api/v1/token/**").permitAll()
                 .antMatchers("/api/v1/**").authenticated()
                 .and().httpBasic()
                 .and().addFilter(authFilter);
