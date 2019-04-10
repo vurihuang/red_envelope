@@ -82,8 +82,11 @@ public class RedEnvelopeRepoTests {
     }
 
     private int random() {
-        Random r = new Random();
-        return r.nextInt(10);
+        int num = MathKit.randomInt(10);
+        while (num <= 0) {
+            num = MathKit.randomInt(10);
+        }
+        return num;
     }
 
 }
