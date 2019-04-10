@@ -22,4 +22,6 @@ public interface RedEnvelopeItemRepo extends JpaRepository<RedEnvelopeItem, Inte
 
     Long countByRedEnvelopeIdAndBelongTo(Integer redEnvelopeId, String belongTo);
 
+    List<RedEnvelopeItem> findByBelongTo(String belongTo);
+
 }

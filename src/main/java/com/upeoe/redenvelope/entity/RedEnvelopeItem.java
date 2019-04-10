@@ -1,5 +1,7 @@
 package com.upeoe.redenvelope.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -19,6 +21,7 @@ public class RedEnvelopeItem implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
+    @JsonIgnore
     @Column(name = "red_envelope_id")
     private Integer redEnvelopeId;
     @Column(name = "belong_to")
