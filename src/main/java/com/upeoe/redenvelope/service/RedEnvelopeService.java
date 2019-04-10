@@ -3,10 +3,13 @@ package com.upeoe.redenvelope.service;
 import com.upeoe.redenvelope.Constants;
 import com.upeoe.redenvelope.entity.RedEnvelope;
 import com.upeoe.redenvelope.entity.RedEnvelopeItem;
+import com.upeoe.redenvelope.entity.User;
 import com.upeoe.redenvelope.exception.BusinessException;
 import com.upeoe.redenvelope.repository.RedEnvelopeItemRepo;
 import com.upeoe.redenvelope.repository.RedEnvelopeRepo;
+import com.upeoe.redenvelope.repository.UserRepo;
 import com.upeoe.redenvelope.utils.DateKit;
+import com.upeoe.redenvelope.utils.MathKit;
 import com.upeoe.redenvelope.utils.RedEnvelopeKit;
 import com.upeoe.redenvelope.utils.SignKit;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -35,6 +41,10 @@ public class RedEnvelopeService {
     @Autowired
     RedEnvelopeItemRepo redEnvelopeItemRepo;
 
+    @Autowired
+    UserRepo userRepo;
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public String sendRedEnvelope(RedEnvelope params) throws BusinessException {
         if (null == params) {
             throw new BusinessException("Invalid request params.");
@@ -64,6 +74,7 @@ public class RedEnvelopeService {
         return sign;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public BigDecimal fetchRedEnvelope(String userId, String sign) throws BusinessException {
         if (StringUtils.isBlank(userId)) {
             throw new BusinessException("Incorrect user.");
@@ -90,6 +101,16 @@ public class RedEnvelopeService {
         item.setBelongTo(userId);
         item.setGetTime(new Date());
         redEnvelopeItemRepo.save(item);
+
+        User user = userRepo.findByUsername(userId);
+        if (null != user) {
+            user.setAmount(new BigDecimal(MathKit.add(
+                    user.getAmount().doubleValue(), item.getAmount().doubleValue())));
+        } else {
+            // if not exists current user, save it.
+            user = new User(userId, item.getAmount());
+        }
+        userRepo.save(user);
 
         return item.getAmount();
     }
