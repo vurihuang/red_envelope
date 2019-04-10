@@ -10,6 +10,6 @@ public class Constants {
     public static final int MAX_RED_ENVELOPE_NUM = 1000;
 
     public static final String JWT_SIGNKEY = "YWhveQ==";
-    public static final long JWT_DEFAULT_EXPIRE_MILLS = 60000;
+    public static final long JWT_DEFAULT_EXPIRE_MILLS = 60000 * 60;
 
 }
