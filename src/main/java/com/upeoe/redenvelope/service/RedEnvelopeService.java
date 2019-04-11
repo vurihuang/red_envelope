@@ -46,6 +46,13 @@ public class RedEnvelopeService {
     @Autowired
     RedisKit redisKit;
 
+    /**
+     * Send red envelope.
+     *
+     * @param params
+     * @return
+     * @throws BusinessException
+     */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public String sendRedEnvelope(RedEnvelope params) throws BusinessException {
         if (null == params) {
@@ -69,6 +76,7 @@ public class RedEnvelopeService {
             params.setExpiredAt(DateKit.forwardDay(now, DateKit.ONE));
             params = redEnvelopeRepo.saveAndFlush(params);
 
+            // Copy data to redis as cache
             redisKit.set(Constants.REDIS_KEY.RED_ENVELOPE_SEND.val + ":" + sign, sign, Constants.ONE_DAY_EXPIRED);
 
             List<Double> redEvlps = RedEnvelopeKit.genListMoney(params.getNumber(), params.getMoney().doubleValue());
@@ -82,6 +90,14 @@ public class RedEnvelopeService {
         }
     }
 
+    /**
+     * Fetch red envelope.
+     *
+     * @param userId
+     * @param sign
+     * @return
+     * @throws BusinessException
+     */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public BigDecimal fetchRedEnvelope(String userId, String sign) throws BusinessException {
         if (StringUtils.isBlank(userId)) {
@@ -92,15 +108,17 @@ public class RedEnvelopeService {
         }
 
         synchronized (RedEnvelopeService.class) {
+            // send red envelope key
             String key = (String) redisKit.get(Constants.REDIS_KEY.RED_ENVELOPE_SEND.val + ":" + sign);
             if (null == key) {
                 throw new BusinessException("Invalid red envelope sign.");
             }
+            // fetch red envelope key
             String fetchKey = Constants.REDIS_KEY.RED_ENVELOPE_ITEM_FETCH.val + ":" + sign;
             boolean isExists = redisKit.sIsMem(fetchKey, userId);
             if (isExists) {
                 throw new BusinessException("Sorry, you have already fetch this red envelope.");
-            }
+            }// send red envelope item key
             String reiSendKey = Constants.REDIS_KEY.RED_ENVELOPE_ITEM_SEND.val + ":" + sign;
             Long len = redisKit.lLen(reiSendKey);
             if (null == len || len == 0) {
@@ -109,6 +127,7 @@ public class RedEnvelopeService {
 
             String lockKey = Constants.LOCK_KEY.RED_ENVELOPE_AT_LOCK.name() + ":" + sign;
             try {
+                // lock for multi pop and save
                 boolean isLock = redisKit.setLock(lockKey, JSONObject.toJSONString(Constants.LOCK_KEY.RED_ENVELOPE_AT_LOCK.name()),
                         Constants.REDIS_LOCK_EXPIRED);
                 if (!isLock) {
@@ -125,6 +144,7 @@ public class RedEnvelopeService {
                 item.setGetTime(new Date());
                 redEnvelopeItemRepo.save(item);
 
+                // update user wallet
                 User user = userRepo.findByUsername(userId);
                 if (null != user) {
                     user.setAmount(new BigDecimal(MathKit.add(

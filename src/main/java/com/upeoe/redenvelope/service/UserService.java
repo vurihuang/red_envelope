@@ -30,6 +30,12 @@ public class UserService {
     @Autowired
     UserRepo userRepo;
 
+    /**
+     * Find send red envelopes by user id.
+     *
+     * @param userId
+     * @return
+     */
     public List<RedEnvelope> findSendRedEnvelopesByUserId(String userId) {
         List<RedEnvelope> result = new ArrayList<>();
 
@@ -39,6 +45,12 @@ public class UserService {
         return redEnvelopeRepo.findAllByUserId(userId);
     }
 
+    /**
+     * Find fetched red envelopes by user id.
+     *
+     * @param userId
+     * @return
+     */
     public List<RedEnvelopeItem> findFetchedRedEnvelopesByUserId(String userId) {
         List<RedEnvelopeItem> result = new ArrayList<>();
 
