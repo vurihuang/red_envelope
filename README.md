@@ -12,15 +12,82 @@
 |-utils       -- 工具类
 ```
 
+使用技术： Spring Boot + MySQL + Redis + Swagger(用于生成 API 文档)
+
 ## API
 
 ![API](https://github.com/upeoe/red_envelope/blob/master/images/API.png)
+
+文档访问链接: 启动项目后访问 `http://xxx/swagger-ui.html`
 
 ``` bash
 # 获取 authentication token
 $ curl http://xxx/api/v1/token/{userId}
 # 发口令红包
 $ curl -X POST -H "Authentication: Bearer <token>" http://xxx/api/v1/red_envelope/send -d "{\"money\":  100, \"number\": 10}"
+```
+
+```
+URL: /api/v1/red_envelope/fetch 领取红包
+Method: POST
+Params:
+    {
+      "sign": "string" // 红包口令
+    }
+Response:
+    {
+      "code": "string",
+      "data": {},
+      "msg": "string"
+    }
+
+URL: /api/v1/red_envelope/send 发送口令红包
+Method: POST
+Params:
+    {
+      "number": 0,  // 红包个数
+      "money": 0    // 红包金额
+    }
+Response:
+    {
+      "code": "string",
+      "data": {},
+      "msg": "string"
+    }
+
+URL: /api/v1/token/{userId}  获取用户授权token
+Method: GET
+Params:
+    userId: 用户标识
+Response:
+    token
+
+URL: /api/v1/user/fetched 当前用户已领取的红包列表
+Method: GET
+Response:
+    {
+      "code": "string",
+      "data": {},
+      "msg": "string"
+    }
+
+URL: /api/v1/user/send 当前用户已发送的红包列表
+Method: GET
+Response:
+    {
+      "code": "string",
+      "data": {},
+      "msg": "string"
+    }
+
+URL: /api/v1/wallet 当前用户的账户余额
+Method: GET
+Response:
+    {
+      "code": "string",
+      "data": {},
+      "msg": "string"
+    }
 ```
 
 ## 想法思路
